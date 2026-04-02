@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OSINT Türkiye - Ücretsiz Araçlar Portalı</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-900 text-white font-sans min-h-screen">
+    <nav class="bg-slate-800 p-4 border-b border-slate-700">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold flex items-center text-blue-400">
+                <i class="fas fa-user-secret mr-2"></i> OSINT Türkiye
+            </h1>
+        </div>
+    </nav>
+
+    <header class="py-12 px-4 text-center">
+        <h2 class="text-3xl font-bold mb-4">Türkçe OSINT Araçları</h2>
+        <p class="text-slate-400 max-w-xl mx-auto italic">Ücretsiz, keyless ve doğrudan tarayıcı üzerinden sorgulama.</p>
+    </header>
+
+    <main class="container mx-auto px-4 pb-20 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+        <!-- USERNAME -->
+        <section class="bg-slate-800 p-6 rounded-lg border border-slate-700">
+            <h3 class="text-lg font-bold mb-4 flex items-center">
+                <i class="fas fa-at mr-2 text-blue-400"></i> Kullanıcı Adı
+            </h3>
+            <input type="text" id="u_in" placeholder="Kullanıcı adı..." class="w-full bg-slate-900 border border-slate-700 p-2 rounded mb-4 focus:border-blue-500 outline-none">
+            <button onclick="srcU()" class="w-full bg-blue-600 py-2 rounded hover:bg-blue-700 transition">Sorgula</button>
+            <div id="u_res" class="mt-4 space-y-2 text-sm max-h-48 overflow-auto"></div>
+        </section>
+
+        <!-- DOMAIN -->
+        <section class="bg-slate-800 p-6 rounded-lg border border-slate-700">
+            <h3 class="text-lg font-bold mb-4 flex items-center">
+                <i class="fas fa-globe mr-2 text-green-400"></i> Domain / IP
+            </h3>
+            <input type="text" id="d_in" placeholder="google.com..." class="w-full bg-slate-900 border border-slate-700 p-2 rounded mb-4 focus:border-green-500 outline-none">
+            <button onclick="srcD()" class="w-full bg-green-600 py-2 rounded hover:bg-green-700 transition">Sorgula</button>
+            <div id="d_res" class="mt-4 text-xs font-mono bg-slate-900 p-2 rounded hidden"></div>
+        </section>
+
+        <!-- EMAIL -->
+        <section class="bg-slate-800 p-6 rounded-lg border border-slate-700">
+            <h3 class="text-lg font-bold mb-4 flex items-center">
+                <i class="fas fa-envelope mr-2 text-purple-400"></i> E-Posta
+            </h3>
+            <input type="text" id="e_in" placeholder="mail@example.com" class="w-full bg-slate-900 border border-slate-700 p-2 rounded mb-4 focus:border-purple-500 outline-none">
+            <button onclick="srcE()" class="w-full bg-purple-600 py-2 rounded hover:bg-purple-700 transition">Sorgula</button>
+            <div id="e_res" class="mt-4 space-y-2 text-sm"></div>
+        </section>
+    </main>
+
+    <script>
+        function srcU() {
+            const val = document.getElementById('u_in').value;
+            if(!val) return;
+            const res = document.getElementById('u_res');
+            res.innerHTML = '<p class="text-blue-400">Aranıyor...</p>';
+            const platforms = [
+                {n:'GitHub', u:'https://github.com/'},
+                {n:'Instagram', u:'https://instagram.com/'},
+                {n:'Twitter', u:'https://twitter.com/'}
+            ];
+            res.innerHTML = platforms.map(p => \`
+                <div class="flex justify-between items-center p-2 bg-slate-900 rounded border border-slate-700">
+                    <span>\${p.n}</span>
+                    <a href="\${p.u}\${val}" target="_blank" class="text-blue-400 underline">Gör</a>
+                </div>
+            \`).join('');
+        }
+
+        async function srcD() {
+            const val = document.getElementById('d_in').value;
+            if(!val) return;
+            const res = document.getElementById('d_res');
+            res.classList.remove('hidden');
+            res.innerHTML = 'Veri çekiliyor...';
+            try {
+                const r = await fetch(\`https://ipapi.co/\${val}/json/\`);
+                const d = await r.json();
+                res.innerHTML = \`<pre class="whitespace-pre-wrap">\${JSON.stringify(d, null, 2)}</pre>\`;
+            } catch {
+                res.innerHTML = 'Hata oluştu.';
+            }
+        }
+
+        function srcE() {
+            const val = document.getElementById('e_in').value;
+            if(!val) return;
+            document.getElementById('e_res').innerHTML = \`
+                <a href="https://haveibeenpwned.com/account/\${val}" target="_blank" class="block p-3 bg-slate-900 border border-slate-700 rounded text-center hover:bg-slate-700">
+                    HIBP Sızıntı Kontrolü
+                </a>
+            \`;
+        }
+    </script>
+</body>
+</html>
